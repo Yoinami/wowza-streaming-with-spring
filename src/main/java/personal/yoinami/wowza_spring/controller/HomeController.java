@@ -30,9 +30,19 @@ public class HomeController {
         return "index";
     }
 
-    @GetMapping("/stream/{videoName}")
-    public String streamVideo(@PathVariable String videoName, Model model) {
-        String streamUrl = wowzaBaseurl + "/vod/mp4:" + videoName + "/playlist.m3u8";
+    @GetMapping("/stream/{videoName}/{videoQuality}")
+    public String streamVideo(@PathVariable String videoName, @PathVariable String videoQuality, Model model) {
+
+
+        if(videoQuality.isBlank()) {
+            videoQuality = "";
+        } else {
+            videoQuality = "_" + videoQuality + "p";
+        }
+
+        String streamUrl = wowzaBaseurl + "/live/mp4:test" + videoQuality + "/playlist.m3u8";
+
+
         model.addAttribute("streamUrl", streamUrl);
         model.addAttribute("videoName", videoName);
 

@@ -19,32 +19,38 @@
     <div id="video-container">
         <button onclick="loadVideo()">Play</button>
         <span>Stream URL:</span>
-        <input type="text" id="streamUrl" th:value="${streamUrl}" readonly>
+        <input type="text" id="streamUrl" value="">
         <br>
         <video id="video" controls></video>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script th:inline="javascript">
+    <script>
+        // Set your stream URL here
+        var streamUrl = ""; // e.g. "https://example.com/stream.m3u8"
+        document.getElementById('streamUrl').value = streamUrl;
+
         document.addEventListener("DOMContentLoaded", onLoadHtml);
 
         async function onLoadHtml() {
             console.log("html loaded: " + new Date().toTimeString());
             loadVideo();
         }
-        console.log([[${streamUrl}]]);
-        var streamUrl = [[${streamUrl}]];
+
         function loadVideo() {
             console.log("loadVideoCalled: " + new Date().toTimeString());
             const video = document.getElementById('video');
             if (Hls.isSupported()) {
                 const hls = new Hls();
-                hls.loadSource(streamUrl);
+                hls.loadSource(document.getElementById('streamUrl').value);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, function() {
                     video.play();
                 });
+                hls.on(Hls.Events.FRAG_LOAD_ERROR, function (event, data) {
+                    console.error('Fragment load error:', data);
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = streamUrl;
+                video.src = document.getElementById('streamUrl').value;
                 video.addEventListener('loadedmetadata', function() {
                     video.play();
                 });
